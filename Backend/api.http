@@ -1,0 +1,76 @@
+###Solicitudes Para Clientes
+
+### Solicitar Lista de clientes
+GET http://localhost:1234/ordenesVenta/clientes
+
+### Crear Cliente
+POST http://localhost:1234/ordenesVenta/clientes
+Content-Type: application/json
+
+{
+    "nombre":"Diego"
+}
+
+### Borrar Cliente
+DELETE http://localhost:1234/ordenesVenta/clientes/2
+
+
+###Solicitudes Para Ordenes
+
+###Solicitar todas las ordenes
+GET http://localhost:1234/ordenesVenta/ordenes
+
+### Crear Orden
+POST http://localhost:1234/ordenesVenta/ordenes/1/3/5
+Content-Type: application/json
+
+{
+    "cantidad":10
+}
+
+### Solicitar Orden por id
+GET http://localhost:1234/ordenesVenta/ordenes/1
+
+###Solicitudes Para Productos
+
+### Solicitar Productos
+GET http://localhost:1234/ordenesVenta/productos
+
+### Solicitar Producto por id
+GET http://localhost:1234/ordenesVenta/productos/1
+
+### Crear un producto
+POST http://localhost:1234/ordenesVenta/productos
+Content-Type: application/json
+
+{
+    "nombre":"Table",
+    "precio":10
+}
+### Actualizar un producto
+PATCH http://localhost:1234/ordenesVenta/productos/2
+Content-Type: application/json
+
+{
+    "nombre": "table",
+    "precio":20
+}
+
+### Eliminar un producto
+DELETE http://localhost:1234/ordenesVenta/productos/2
+
+
+
+###Solicitudes Para Descuentos
+
+### Crear Descuento
+POST http://localhost:1234/ordenesVenta/descuentos
+Content-Type: application/json
+
+{
+    "value":30
+}
+
+### Eliminar Descuento
+DELETE http://localhost:1234/ordenesVenta/descuentos/2
+
