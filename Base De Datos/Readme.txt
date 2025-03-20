@@ -1,0 +1,1 @@
+Aqui deja la query con la que cree la base de Datos donde muestro cada tabla con sus campos y con sus atributos 
