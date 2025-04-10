@@ -1,0 +1,6 @@
+@Primera_Base_De_Datos_HostAddress = http://localhost:5275
+
+GET {{Primera_Base_De_Datos_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
