@@ -82,16 +82,32 @@ public class ProductsLineController : ControllerBase
             FinalPrice = finalPrice
         };
 
-        // 6. Agregar el ProductLine al Order
-        order.ProductLines.Add(productLine); // ¡Aquí se agrega a la lista del Order!
+        // Calcular el total potencial de la orden
+        var existingLines = await _context.ProductLines
+            .Where(pl => pl.OrderId == productLineInsert.OrderId)
+            .ToListAsync();
 
-        // 7. Guardar cambios
-        await _context.SaveChangesAsync();
+        decimal currentTotal = existingLines.Sum(pl => pl.TotalPrice);
+        decimal potentialTotal = currentTotal + productLine.TotalPrice;
 
-        return CreatedAtAction(nameof(GetProductLineId), new
+        // Obtener cliente y validar crédito
+        var client = await _context.Clients.FindAsync(order.ClientId);
+        if (client == null) return NotFound("Cliente no encontrado");
+
+        if (potentialTotal > client.Credit)
         {
-            id = productLine.Id
-        }, productLine);
+            return BadRequest("Crédito insuficiente. No se puede agregar la línea.");
+        }
+
+        // Restar el total de la línea al crédito del cliente
+        client.Credit -= productLine.TotalPrice; // ¡Nueva línea!
+
+        // Agregar la línea al pedido y guardar cambios
+        order.ProductLines.Add(productLine);
+        await _context.SaveChangesAsync(); // Guarda cambios en ProductLine y Client
+
+        return CreatedAtAction(nameof(GetProductLineId), new { id = productLine.Id }, productLine);
+
     }
 
     [HttpPut("{id}")]
@@ -103,31 +119,30 @@ public class ProductsLineController : ControllerBase
             return NotFound("Linea de Producto no encontrada");
         }
 
-        var order = await _context.Orders.FindAsync(productLineInsert.OrderId);
-        if (order == null)
+        // Obtener la orden original (antes de cambios)
+        var originalOrder = await _context.Orders.FindAsync(productLine.OrderId);
+        if (originalOrder == null)
         {
-            return NotFound("El pedido no existe");
+            return NotFound("Orden original no encontrada");
         }
 
-        var product = await _context.Products.FindAsync(productLineInsert.ProductId);
-        if (product == null)
+        // Obtener el cliente original
+        var originalClient = await _context.Clients.FindAsync(originalOrder.ClientId);
+        if (originalClient == null)
+        {
+            return NotFound("Cliente original no encontrado");
+        }
+
+        // Guardar el total antiguo
+        decimal oldTotal = productLine.TotalPrice;
+
+        // Validar y actualizar la línea (productLineInsert)
+        var newProduct = await _context.Products.FindAsync(productLineInsert.ProductId);
+        if (newProduct == null)
         {
             return NotFound("Producto no encontrado");
         }
 
-        // 1. Validar que exista el Order
-        if (order == null)
-        {
-            return NotFound("El pedido no existe");
-        }
-
-        // 2. Validar que exista el Product
-        if (product == null)
-        {
-            return NotFound("Producto no encontrado");
-        }
-
-        // 3. Validar el Discount (si se proporciona un DiscountId)
         Discount? discount = null;
         if (productLineInsert.DiscountId.HasValue)
         {
@@ -138,14 +153,51 @@ public class ProductsLineController : ControllerBase
             }
         }
 
+        // Actualizar propiedades de la línea
         productLine.OrderId = productLineInsert.OrderId;
         productLine.ProductId = productLineInsert.ProductId;
-        productLine.ProductName = product.Name;
+        productLine.ProductName = newProduct.Name;
+        productLine.OriginalPrice = newProduct.Price;
+        productLine.FinalPrice = ProductLine.CalculateFinalPrice(newProduct.Price, discount);
         productLine.DiscountId = productLineInsert.DiscountId;
         productLine.DiscountValue = discount?.Value;
         productLine.Quantity = productLineInsert.Quantity;
-        productLine.OriginalPrice = product.Price;
-        productLine.FinalPrice = ProductLine.CalculateFinalPrice(product.Price, discount);
+
+        // Calcular nuevo total
+        decimal newTotal = productLine.TotalPrice;
+        decimal difference = newTotal - oldTotal;
+
+        // Obtener la nueva orden (si cambió el OrderId)
+        var newOrder = await _context.Orders.FindAsync(productLineInsert.OrderId);
+        if (newOrder == null)
+        {
+            return NotFound("Nueva orden no encontrada");
+        }
+
+        // Obtener el cliente de la nueva orden
+        var newClient = await _context.Clients.FindAsync(newOrder.ClientId);
+        if (newClient == null)
+        {
+            return NotFound("Cliente nuevo no encontrado");
+        }
+
+        // Si la orden cambió, restaurar crédito al cliente original y restar al nuevo
+        if (originalOrder.Id != newOrder.Id)
+        {
+            originalClient.Credit += oldTotal; // Restaura crédito al cliente original
+            newClient.Credit -= newTotal; // Resta crédito al nuevo cliente
+        }
+        else
+        {
+            // Misma orden: ajustar crédito según la diferencia
+            newClient.Credit -= difference;
+        }
+
+        // Validar crédito suficiente (solo si diferencia es positiva)
+        if (newClient.Credit < 0)
+        {
+            return BadRequest("Crédito insuficiente");
+        }
 
         await _context.SaveChangesAsync();
 
@@ -160,6 +212,23 @@ public class ProductsLineController : ControllerBase
         {
             return NotFound("Linea de Producto no encontrada");
         }
+
+        var OrderId = productLine.OrderId;
+
+        var order = await _context.Orders.FindAsync(OrderId);
+        if (order == null)
+        {
+            return NotFound("El pedido no existe");
+        }
+
+        var client = await _context.Clients.FindAsync(order.ClientId);
+        if (client == null)
+        {
+            return NotFound("Cliente no encontrado");
+        }
+
+        // Restar el total de la línea al crédito del cliente
+        client.Credit += productLine.TotalPrice; // ¡Nueva línea!
 
         _context.ProductLines.Remove(productLine);
         await _context.SaveChangesAsync();

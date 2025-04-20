@@ -20,6 +20,7 @@ public class ClientController : ControllerBase
     {
         return await _context.Clients
         .Include(c => c.Orders)
+            .ThenInclude(o => o.ProductLines)
         .ToListAsync();
 
     }
@@ -29,6 +30,7 @@ public class ClientController : ControllerBase
     {
         var client = await _context.Clients
         .Include(c => c.Orders)
+            .ThenInclude(o => o.ProductLines)
         .FirstOrDefaultAsync(c => c.Id == id);
         return client == null ? NotFound("Cliente no encontrado") : client;
     }
@@ -39,7 +41,7 @@ public class ClientController : ControllerBase
         var client = new Client
         {
             Name = clientInsert.Name,
-            Money = clientInsert.Money,
+            Credit = clientInsert.Credit,
         };
 
         _context.Clients.Add(client);
@@ -58,7 +60,7 @@ public class ClientController : ControllerBase
         }
 
         client.Name = clientInsert.Name;
-        client.Money = clientInsert.Money;
+        client.Credit = clientInsert.Credit;
 
         await _context.SaveChangesAsync();
 

@@ -35,7 +35,7 @@ namespace MiProyectoMySQL.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Client>()
-                .Property(c => c.Money)
+                .Property(c => c.Credit)
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<Discount>()

@@ -40,14 +40,14 @@ const Home = ()=>{
             if (!res.ok) {
                 throw new Error("Error en la eliminación del artículo");
             }
-            return res.json(); // Devuelve la respuesta en formato JSON
+            return res.json();
         })
         .then((data) => {
             BuscarProductos()
-            console.log(data.message); // Actualiza el estado con el mensaje de respuesta
+            console.log(data.message);
         })
         .catch((error) => {
-            console.log(error.message); // Maneja el error y actualiza el estado
+            console.log(error.message);
         });
     }
 

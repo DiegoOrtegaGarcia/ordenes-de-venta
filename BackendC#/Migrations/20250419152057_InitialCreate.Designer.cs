@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Primera_Base_De_Datos.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250410001328_InitialCreate")]
+    [Migration("20250419152057_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,7 +33,7 @@ namespace Primera_Base_De_Datos.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Money")
+                    b.Property<decimal>("Credit")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 

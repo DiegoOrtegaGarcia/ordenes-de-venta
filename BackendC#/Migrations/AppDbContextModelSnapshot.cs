@@ -30,7 +30,7 @@ namespace Primera_Base_De_Datos.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Money")
+                    b.Property<decimal>("Credit")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 

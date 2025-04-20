@@ -5,7 +5,7 @@ public class Client
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
-    public decimal Money { get; set; }
+    public decimal Credit { get; set; }
 
     public virtual List<Order> Orders { get; set; } = new List<Order>();
 
