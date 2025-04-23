@@ -1,14 +1,17 @@
-import useProducts from "@/hooks/products/use-Products"
 import { Button } from "@/components/ui/button"
-import {Card,CardContent,CardHeader,CardTitle,} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import useOrdersLine from "@/hooks/clients/use-Orders-Line"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PropsForms } from "@/lib/types/types"
 
+interface LineProductFormProps extends PropsForms {
+    ordernId: number
+}
 
-const ProductsForm = ({onClose}: React.ComponentProps<"div"> & PropsForms) => {
+const LineProductForm = ({ordernId,onClose}: React.ComponentProps<"div"> & LineProductFormProps) => {
     
-    const{register,handleSubmit,errors,onSubmit,errorMesage,successMesage} = useProducts()
+    const{register,handleSubmit,errors,onSubmit,errorMesage,successMesage} = useOrdersLine()
 
     return (
         <div className="fixed inset-0 bg-black/30 z-40 backdrop-blur-sm flex items-center justify-center p-4">
@@ -24,35 +27,36 @@ const ProductsForm = ({onClose}: React.ComponentProps<"div"> & PropsForms) => {
             
             <CardHeader className="text-center space-y-1">
               <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Nuevo Producto
+                Nueva Línea de Producto
               </CardTitle>
             </CardHeader>
             
             <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit((data) => onSubmit(data, ordernId))} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Nombre del Producto</Label>
+                    <Label className="text-sm font-medium text-gray-700">ID del Producto</Label>
                     <Input
-                      {...register("name")}
-                      placeholder="Ej: Producto Premium"
+                      type="number"
+                      {...register("productId", {valueAsNumber: true})}
+                      placeholder="Ej: 12345"
                       className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
                     />
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                    {errors.productId && (
+                      <p className="mt-1 text-sm text-red-600">{errors.productId.message}</p>
                     )}
                   </div>
                   
                   <div>
-                    <Label className="text-sm font-medium text-gray-700">Precio</Label>
+                    <Label className="text-sm font-medium text-gray-700">Cantidad</Label>
                     <Input
                       type="number"
-                      {...register("price", {valueAsNumber: true})}
-                      placeholder="Ej: 99.99"
+                      {...register("quantity", {valueAsNumber: true})}
+                      placeholder="Ej: 5"
                       className="mt-1 focus-visible:ring-2 focus-visible:ring-blue-500"
                     />
-                    {errors.price && (
-                      <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
+                    {errors.quantity && (
+                      <p className="mt-1 text-sm text-red-600">{errors.quantity.message}</p>
                     )}
                   </div>
                 </div>
@@ -61,7 +65,7 @@ const ProductsForm = ({onClose}: React.ComponentProps<"div"> & PropsForms) => {
                   type="submit" 
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
                 >
-                  Crear Producto
+                  Agregar Producto
                 </Button>
     
                 {errorMesage.length > 1 && (
@@ -82,4 +86,5 @@ const ProductsForm = ({onClose}: React.ComponentProps<"div"> & PropsForms) => {
       )
 }
 
-export default ProductsForm
+
+export default LineProductForm

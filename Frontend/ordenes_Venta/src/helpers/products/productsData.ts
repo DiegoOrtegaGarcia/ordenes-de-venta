@@ -1,5 +1,6 @@
 import { ProductInsertInterface } from "@/lib/types/types"
 import { getProducts, insertProductData, removeProductData } from "@/services/products/products"
+import formatLetter from "@/utils/format/formatLetter"
 
 export const getProductsData = async () => {
     try {
@@ -21,8 +22,9 @@ export const removeProduct = async (id: number) => {
 
 export const insertProduct = async (data: ProductInsertInterface) => {
 
+
     const dataToSend : ProductInsertInterface = {
-        name: data.name,
+        name: formatLetter(data.name),
         price: data.price
     }
     try {

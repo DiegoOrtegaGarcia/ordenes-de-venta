@@ -1,4 +1,6 @@
-import { getClients, removeClientData } from "@/services/clients/clients"
+import { ClientInsertInterface } from "@/lib/types/types"
+import { addClientData, getClients, removeClientData } from "@/services/clients/clients"
+import formatLetter from "@/utils/format/formatLetter"
 
 export const getClientsData = async () => {
     try {
@@ -17,3 +19,18 @@ export const removeClient = async (id: number) => {
         return {type: "error", response: error}
     }
 }
+
+export const addClient = async (data: ClientInsertInterface) => {
+
+    const dataToSend : ClientInsertInterface = {
+        name: formatLetter(data.name),
+        credit: data.credit
+    }
+    try {
+        const client = await addClientData(dataToSend)
+        return {type: "success", response: client}
+    } catch (error) {
+        return {type: "error", response: error}
+    }
+}
+

@@ -8,7 +8,7 @@ import {
   import { DashboardLayoutProps } from "@/lib/types/types"
   import { ChevronRight } from "lucide-react"
   
-  const DashboardLayout = ({ current,link,linkName }: DashboardLayoutProps) => {
+  const DashboardLayout = ({ current,link,linkName,secondLink,secondLinkName }: DashboardLayoutProps) => {
     return (
       <div className="w-full bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,6 +34,17 @@ import {
                       className="text-gray-500 hover:text-gray-700 transition-colors font-medium"
                     >
                       {linkName}
+                    </BreadcrumbLink>
+                    <BreadcrumbSeparator>
+                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                  </BreadcrumbSeparator>
+                  </BreadcrumbItem>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink
+                      href={`/${secondLink}`}
+                      className="text-gray-500 hover:text-gray-700 transition-colors font-medium"
+                    >
+                      {secondLinkName}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator>
